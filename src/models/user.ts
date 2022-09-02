@@ -129,6 +129,13 @@ class UserClass {
 
   @prop({
     type: SchemaTypes.Boolean,
+    required: [true, "Active status is required"],
+    default: false,
+  })
+  public isActive: boolean;
+
+  @prop({
+    type: SchemaTypes.Boolean,
     required: [true, "Email verified is required"],
     default: false,
   })
