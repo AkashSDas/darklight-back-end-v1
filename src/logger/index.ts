@@ -1,7 +1,9 @@
+import { Logger } from "winston";
+
 import devLogger from "./dev-logger";
 import prodLogger from "./prod-logger";
 
-let logger = null;
+let logger: Logger = null;
 
 if (process.env.NODE_ENV !== "production") {
   logger = devLogger();
