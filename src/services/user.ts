@@ -22,3 +22,20 @@ export const createUser = (data: Partial<UserClass>) => {
   const user = new UserModel(data);
   return user.save();
 };
+
+/**
+ * Updater user document
+ *
+ * @param filter - filter query for filtering out the user
+ * @param data - user data
+ * @returns A promise for updating the user document
+ */
+export const updateUser = (
+  filter: FilterQuery<UserClass>,
+  data: Partial<UserClass>
+) => {
+  return UserModel.findOneAndUpdate(filter, data, {
+    new: true,
+    fields: "-_id -_v",
+  });
+};
