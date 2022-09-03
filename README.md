@@ -8,3 +8,8 @@ REST API back-end for the 🌗 DarkLight project.
 - Write file/folder names using `kebab-case`
 - All of the APIs should be under the route `/api` (Eg: `/api/users`)
 - The `/controllers` don't talk to databases, `/services` do
+
+## Nodemailer
+
+- The `nodemailer` module is used to send emails
+- `Mailtrap` is used to test the emails
