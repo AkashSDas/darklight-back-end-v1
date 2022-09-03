@@ -16,10 +16,22 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { SchemaTypes, Types } from "mongoose";
-import { v4 } from "uuid";
+import { nanoid } from "nanoid";
 import validator from "validator";
 
 import { getModelForClass, modelOptions, post, pre, prop, Severity } from "@typegoose/typegoose";
+
+enum ProviderEnum {
+  GOOGLE = "google",
+  FACEBOOK = "facebook",
+  LOCAL = "local",
+}
+
+export enum RoleEnum {
+  ADMIN = "admin",
+  STUDENT = "student",
+  INSTRUCTOR = "instructor",
+}
 
 // SOCIAL AUTHENTICATION PROVIDER MODEL
 class SocialAuthenticationProvider {
@@ -34,12 +46,18 @@ class SocialAuthenticationProvider {
   @prop({
     type: SchemaTypes.String,
     required: [true, "Provider is required"],
-    enum: {
-      values: ["google", "facebook", "twitter"],
-      message: "{VALUE} provider is not available",
-    },
+    enum: ProviderEnum,
   })
-  public provider: "google" | "facebook" | "twitter";
+  public provider: ProviderEnum;
+}
+
+// Profile pic sub-document
+class ProfilePic {
+  @prop({ type: SchemaTypes.String })
+  public id: string;
+
+  @prop({ type: SchemaTypes.String })
+  public URL: string;
 }
 
 // USER SCHEMA
@@ -59,19 +77,23 @@ class SocialAuthenticationProvider {
   }
 })
 @modelOptions({
-  schemaOptions: { timestamps: true, toJSON: { virtuals: true } },
+  schemaOptions: {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    typeKey: "type",
+  },
   options: { allowMixed: Severity.ALLOW, customName: "user" },
 })
-class UserClass {
+export class UserClass {
   // PROPERTIES
 
   @prop({
     type: SchemaTypes.String,
     required: [true, "User ID is required"],
     unique: true,
-    maxlength: [12, "User ID must be less than 12 characters"],
+    maxlength: [24, "User ID must be less than 12 characters"],
     immutable: true,
-    default: () => v4(),
+    default: () => nanoid(24),
   })
   public userId: string;
 
@@ -102,21 +124,21 @@ class UserClass {
   })
   public email: string;
 
-  @prop({
-    _id: false,
-    type: {
-      id: { type: SchemaTypes.String },
-      URL: { type: SchemaTypes.String },
-    },
-  })
-  public profilePic?: { id?: string; URL?: string };
+  @prop({ type: () => ProfilePic })
+  public profilePic?: ProfilePic;
 
   @prop({
-    type: [SchemaTypes.String],
-    required: [true, "A single role is required"],
-    default: ["student"],
+    // ValidationError: user validation failed: roles: Cast to string failed for value "[ 'student' ]" (type Array) at path "roles" at model.Document.invalidate
+    // type: () => [String],
+    type: () => SchemaTypes.Array,
+
+    // InvalidEnumTypeError: Invalid Type used for options "enum" at "user.roles"! [E012]
+    // enum: RoleEnum,
+
+    required: true,
+    default: [RoleEnum.STUDENT],
   })
-  public roles: ("student" | "instructor" | "admin")[];
+  public roles: ("admin" | "instructor" | "student")[];
 
   @prop({ type: SchemaTypes.String, select: false })
   public passwordDigest?: string;
