@@ -17,4 +17,11 @@ export const signupUserSchema = object({
   }),
 });
 
+export const confirmEmailSchema = object({
+  params: object({
+    token: string(),
+  }),
+});
+
 export type SignupUserInput = TypeOf<typeof signupUserSchema>["body"];
+export type ConfirmEmailInput = TypeOf<typeof confirmEmailSchema>["params"];

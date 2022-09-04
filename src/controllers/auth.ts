@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
 import logger from "../logger";
-import { SignupUserInput } from "../schema/user";
+import { ConfirmEmailInput, SignupUserInput } from "../schema/user";
 import { createUser, getUser, updateUser } from "../services/user";
 import { BaseApiError } from "../utils/error";
 import { sendResponse } from "../utils/response";
 import { sendEmail } from "../utils/send-email";
-import { AsyncController } from "../utils/types";
 
 /**
  * Signup user controller
@@ -92,7 +91,10 @@ export const signup = async (
 /**
  * `Verfiy` user's email account and make it `active`
  */
-export const confirmEmail: AsyncController = async (req, res) => {
+export const confirmEmail = async (
+  req: Request<ConfirmEmailInput>,
+  res: Response
+) => {
   // User having the token and token is not expired
   const user = await getUser({
     emailVerificationToken: req.params.token,

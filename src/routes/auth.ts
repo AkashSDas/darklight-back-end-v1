@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { confirmEmail, signup } from "../controllers/auth";
 import { validateResource } from "../middlewares/validate-resourse";
-import { signupUserSchema } from "../schema/user";
+import { confirmEmailSchema, signupUserSchema } from "../schema/user";
 import { runAsync } from "../utils/async";
 import { errorHandler } from "../utils/error";
 
@@ -17,4 +17,9 @@ router.post(
   errorHandler
 );
 
-router.get("/confirm-email/:token", runAsync(confirmEmail), errorHandler);
+router.get(
+  "/confirm-email/:token",
+  validateResource(confirmEmailSchema),
+  runAsync(confirmEmail),
+  errorHandler
+);
