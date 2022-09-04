@@ -217,7 +217,7 @@ export class UserClass {
     // Set the token expiry time to 10 minutes
     this.passwordResetTokenExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    return this.passwordResetToken;
+    return token;
   }
 
   /**
@@ -235,7 +235,7 @@ export class UserClass {
     // Set the token expiry time to 10 minutes
     this.emailVerificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    return this.emailVerificationToken;
+    return token;
   }
 
   // VIRUTALS
