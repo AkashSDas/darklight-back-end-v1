@@ -9,7 +9,7 @@ import UserModel, { UserClass } from "../models/user";
  * @returns A promise of finding the one user that matches the filter
  */
 export const getUser = async (filter: FilterQuery<UserClass>) => {
-  return UserModel.findOne(filter, "-_id -__v").exec();
+  return UserModel.findOne(filter, "-__v").exec();
 };
 
 /**
