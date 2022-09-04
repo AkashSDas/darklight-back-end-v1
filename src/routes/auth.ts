@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { signup } from "../controllers/auth";
+import { confirmEmail, signup } from "../controllers/auth";
 import { validateResource } from "../middlewares/validate-resourse";
 import { signupUserSchema } from "../schema/user";
 import { runAsync } from "../utils/async";
@@ -13,6 +13,8 @@ export const router = Router();
 router.post(
   "/signup",
   validateResource(signupUserSchema),
-  runAsync(signup)
-  //   errorHandler
+  runAsync(signup),
+  errorHandler
 );
+
+router.get("/confirm-email/:token", runAsync(confirmEmail), errorHandler);

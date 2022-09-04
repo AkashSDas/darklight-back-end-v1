@@ -6,6 +6,7 @@ import { createUser, getUser, updateUser } from "../services/user";
 import { BaseApiError } from "../utils/error";
 import { sendResponse } from "../utils/response";
 import { sendEmail } from "../utils/send-email";
+import { AsyncController } from "../utils/types";
 
 /**
  * Signup user controller
@@ -45,7 +46,7 @@ export const signup = async (
 
   // URL sent to user for verifying user's email
   // const emailVerificationUrl = `${process.env.APP_URL}/auth/verify-email?token=${emailVerificationToken}`;
-  const url = `/auth/confirm-email/${emailVerificationToken}`;
+  const url = `/api/auth/confirm-email/${emailVerificationToken}`;
   const confirmEmailURL = `${req.protocol}://${req.get("host")}${url}`;
 
   const opts = {
@@ -86,4 +87,34 @@ export const signup = async (
     logger.error(err);
     throw new BaseApiError(500, "Something went wrong, Please try again");
   }
+};
+
+/**
+ * `Verfiy` user's email account and make it `active`
+ */
+export const confirmEmail: AsyncController = async (req, res) => {
+  // User having the token and token is not expired
+  const user = await getUser({
+    emailVerificationToken: req.params.token,
+    emailVerificationTokenExpires: { $gt: new Date(Date.now()) },
+  });
+  logger.info(req.params.token);
+  if (!user) throw new BaseApiError(400, "Invalid or expired token");
+
+  // Updating the user's emailVerified field to true
+  await updateUser(
+    { userId: user.userId },
+    {
+      isActive: true,
+      emailVerified: true,
+      emailVerificationToken: undefined,
+      emailVerificationTokenExpires: undefined,
+    }
+  );
+
+  return sendResponse(res, {
+    status: 200,
+    error: false,
+    msg: "Email is verified and your account is activated",
+  });
 };
