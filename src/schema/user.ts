@@ -14,6 +14,7 @@ export const signupUserSchema = object({
     confirmPassword: string({ required_error: "Confirm password is required" }),
   }).refine((data) => data.password === data.confirmPassword, {
     message: "Password and confirm password does not match",
+    path: ["confirmPassword"],
   }),
 });
 
@@ -23,5 +24,33 @@ export const confirmEmailSchema = object({
   }),
 });
 
+export const forgotPasswordSchema = object({
+  body: object({
+    email: string({ required_error: "Email is required" }).email(
+      "Email is invalid"
+    ),
+  }),
+});
+
+export const confirmPasswordResetSchema = object({
+  params: object({
+    token: string(),
+  }),
+  body: object({
+    password: string({ required_error: "Password is required" }).min(6, {
+      message: "Password must be more than 6 characters",
+    }),
+    confirmPassword: string({ required_error: "Confirm password is required" }),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Password and confirm password does not match",
+    path: ["confirmPassword"],
+  }),
+});
+
 export type SignupUserInput = TypeOf<typeof signupUserSchema>["body"];
 export type ConfirmEmailInput = TypeOf<typeof confirmEmailSchema>["params"];
+export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>["body"];
+
+export type ConfirmForgotPasswordInput = TypeOf<
+  typeof confirmPasswordResetSchema
+>;
