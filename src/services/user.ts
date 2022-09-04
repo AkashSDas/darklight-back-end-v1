@@ -13,6 +13,16 @@ export const getUser = async (filter: FilterQuery<UserClass>) => {
 };
 
 /**
+ * Get user count that matches the filter
+ *
+ * @param filter - filter query for filtering out the user
+ * @returns A promise of getting the number of users matching the filter
+ */
+export const userExists = async (filter: FilterQuery<UserClass>) => {
+  return UserModel.count(filter).exec();
+};
+
+/**
  * Creates an new user document in the database.
  *
  * @param data - user data
