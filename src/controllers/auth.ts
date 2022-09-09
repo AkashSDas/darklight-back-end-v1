@@ -1,7 +1,9 @@
 import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
 import logger from "../logger";
+import UserModel from "../models/user";
 import { ConfirmEmailInput, ConfirmForgotPasswordInput, ForgotPasswordInput, SignupUserInput } from "../schema/user";
 import { createUser, getUser, updateUser } from "../services/user";
 import { BaseApiError } from "../utils/error";
@@ -215,5 +217,123 @@ export const confirmPasswordReset = async (
     error: false,
     msg: "Password reset is successful",
     data: { user, token: jwtToken },
+  });
+};
+
+/**
+ * @description Login user with email and password
+ * @route POST /api/auth/login
+ * @access Public
+ */
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  // Check if the user with provided email exists
+  // get passwordDigest too as while using `.isAuthenticated` method we need it
+  const user = await UserModel.findOne({ email }).select("+passwordDigest");
+  if (!user) throw new BaseApiError(400, "No such account");
+
+  // Check if the password is correct
+  if (!(await user.isAuthenticated(password))) {
+    throw new BaseApiError(401, "Unauthorized, incorrect password");
+  }
+
+  // Access token, short duration
+  const accessToken = jwt.sign(
+    { userId: user.userId, email: user.email },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "1m" }
+  );
+
+  // Refresh token, long duration but does expires
+  const refreshToken = jwt.sign(
+    { userId: user.userId, email: user.email },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "5m" }
+  );
+
+  res.cookie("jwt", refreshToken, {
+    httpOnly: true, // accessible only be web server
+    // secure: true, // only accessible via https
+    sameSite: "none", // to allow cross-site cookies
+    maxAge: 1000 * 60 * 5, // 5 minutes, should match the expiresIn of the refresh token
+  });
+
+  // Sending the access token which contains userId and email to the client
+  user.passwordDigest = undefined; // remove the password digest from the response
+  sendResponse(res, {
+    status: 200,
+    error: false,
+    msg: "Login successful",
+    data: { user, accessToken },
+  });
+};
+
+/**
+ * @description Send a new access token if the refresh token is valid
+ * @route POST /api/auth/refresh
+ * @access Public - because access token has expired
+ */
+export const refresh = async (req: Request, res: Response) => {
+  const cookies = req.cookies;
+  console.table(req.cookies);
+  if (!cookies?.jwt) throw new BaseApiError(401, "Unauthorized, no token");
+  const refreshToken = cookies.jwt;
+
+  // Verify the refresh token
+  try {
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      async (err, decoded) => {
+        if (err) throw new BaseApiError(403, "Forbidden");
+        const user = await getUser({ userId: decoded.userId });
+        if (!user) throw new BaseApiError(401, "Unauthorized");
+
+        const accessToken = jwt.sign(
+          { userId: user.userId, email: user.email },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "1m" }
+        );
+
+        sendResponse(res, {
+          status: 200,
+          error: false,
+          msg: "New refresh token",
+          data: { user, accessToken },
+        });
+      }
+    );
+  } catch (err) {
+    logger.error(err);
+    throw new BaseApiError(500, "Something went wrong please try again");
+  }
+};
+
+/**
+ * @description Logout user
+ * @route POST /api/auth/logout
+ * @access Public
+ */
+export const logout = async (req: Request, res: Response) => {
+  if (!req.cookies?.jwt) throw new BaseApiError(204, "No content");
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    // secure: true,
+    sameSite: "none",
+  });
+  sendResponse(res, {
+    status: 200,
+    error: false,
+    msg: "Logout successful",
+  });
+};
+
+export const checkAuth = async (req: Request, res: Response) => {
+  logger.info(req.user);
+  sendResponse(res, {
+    status: 200,
+    error: false,
+    msg: "Checking auth",
   });
 };
