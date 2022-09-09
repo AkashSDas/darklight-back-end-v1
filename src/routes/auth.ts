@@ -1,7 +1,9 @@
 import { Router } from "express";
 
-import { confirmEmail, confirmPasswordReset, forgotPassword, signup } from "../controllers/auth";
+import { checkAuth, confirmEmail, confirmPasswordReset, forgotPassword, login, logout, refresh, signup } from "../controllers/auth";
+import { loginLimiter } from "../middlewares/auth";
 import { validateResource } from "../middlewares/validate-resourse";
+import { verifyJwt } from "../middlewares/verify-jwt";
 import { confirmEmailSchema, confirmPasswordResetSchema, forgotPasswordSchema, signupUserSchema } from "../schema/user";
 import { runAsync } from "../utils/async";
 import { errorHandler } from "../utils/error";
@@ -34,4 +36,8 @@ router
     validateResource(confirmPasswordResetSchema),
     runAsync(confirmPasswordReset),
     errorHandler
-  );
+  )
+  .post("/login", runAsync(login), errorHandler) // loginLimiter,
+  .get("/refresh", runAsync(refresh), errorHandler)
+  .get("/logout", runAsync(logout), errorHandler)
+  .get("/check", verifyJwt, runAsync(checkAuth), errorHandler);
