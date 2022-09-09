@@ -21,6 +21,10 @@
  *      {"compilerOptions": "typeRoots": [ "@types" ] }
  */
 
-declare namespace Express {
-  interface Request {}
+import UserModel, { UserClass } from "../../src/models/user";
+
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: UserClass;
+  }
 }
