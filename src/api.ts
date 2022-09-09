@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -12,6 +13,7 @@ app.use(cors()); // Enable CORS
 app.use(express.json()); // for parsing incoming data
 app.use(express.urlencoded({ extended: true })); // parses incoming requests with urlencoded payloads
 app.use(morgan("tiny")); // Log requests to the console
+app.use(cookieParser());
 
 // Routes
 
