@@ -13,3 +13,7 @@ REST API back-end for the 🌗 DarkLight project.
 
 - The `nodemailer` module is used to send emails
 - `Mailtrap` is used to test the emails
+
+## Auth
+
+- set `secure` to true while setting `cookies` while working on `production` environment
