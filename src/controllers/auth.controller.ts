@@ -3,9 +3,9 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 import logger from "../logger";
-import UserModel from "../models/user";
+import UserModel from "../models/user.model";
 import { ConfirmEmailInput, ConfirmForgotPasswordInput, ForgotPasswordInput, LoginInput, SignupUserInput } from "../schema/user";
-import { createUser, getUser, updateUser } from "../services/user";
+import { createUser, getUser, updateUser } from "../services/user.service";
 import { BaseApiError } from "../utils/error";
 import { sendResponse } from "../utils/response";
 import { sendEmail } from "../utils/send-email";

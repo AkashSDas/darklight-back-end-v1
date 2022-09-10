@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { checkAuth, confirmEmail, confirmPasswordReset, forgotPassword, login, logout, refresh, signup } from "../controllers/auth";
+import { checkAuth, confirmEmail, confirmPasswordReset, forgotPassword, login, logout, refresh, signup } from "../controllers/auth.controller";
 import { validateResource } from "../middlewares/validate-resourse";
 import { verifyJwt } from "../middlewares/verify-jwt";
 import { confirmEmailSchema, confirmPasswordResetSchema, forgotPasswordSchema, signupUserSchema } from "../schema/user";

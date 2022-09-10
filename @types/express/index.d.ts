@@ -21,7 +21,7 @@
  *      {"compilerOptions": "typeRoots": [ "@types" ] }
  */
 
-import UserModel, { UserClass } from "../../src/models/user";
+import { UserClass } from "../../src/models/user.model";
 
 declare module "express-serve-static-core" {
   interface Request {

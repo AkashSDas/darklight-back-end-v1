@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import logger from "../logger";
-import { getUser } from "../services/user";
+import { getUser } from "../services/user.service";
 import { BaseApiError } from "../utils/error";
 import { AsyncMiddleware } from "../utils/types";
 

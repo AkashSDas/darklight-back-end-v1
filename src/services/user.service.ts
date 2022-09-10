@@ -1,6 +1,6 @@
 import { FilterQuery } from "mongoose";
 
-import UserModel, { UserClass } from "../models/user";
+import UserModel, { UserClass } from "../models/user.model";
 
 /**
  * Find one user
