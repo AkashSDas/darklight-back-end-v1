@@ -337,6 +337,6 @@ export const checkAuth = async (req: Request, res: Response) => {
   sendResponse(res, {
     status: 200,
     error: false,
-    msg: "You are authentication",
+    msg: "You are authenticated",
   });
 };
