@@ -20,7 +20,11 @@ export const verifyJwt: AsyncMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    logger.error(err);
+    logger.error(`/mid/verify-jwt: ${err}`);
+
+    if (err instanceof jwt.TokenExpiredError) {
+      throw new BaseApiError(401, "Session expired, Please login again");
+    }
     throw new BaseApiError(500, "Something went wrong, Please try agian");
   }
 };
