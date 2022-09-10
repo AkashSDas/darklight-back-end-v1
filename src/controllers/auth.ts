@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 import logger from "../logger";
 import UserModel from "../models/user";
-import { ConfirmEmailInput, ConfirmForgotPasswordInput, ForgotPasswordInput, SignupUserInput } from "../schema/user";
+import { ConfirmEmailInput, ConfirmForgotPasswordInput, ForgotPasswordInput, LoginInput, SignupUserInput } from "../schema/user";
 import { createUser, getUser, updateUser } from "../services/user";
 import { BaseApiError } from "../utils/error";
 import { sendResponse } from "../utils/response";
@@ -225,7 +225,10 @@ export const confirmPasswordReset = async (
  * @route POST /api/auth/login
  * @access Public
  */
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request<{}, {}, LoginInput>,
+  res: Response
+) => {
   const { email, password } = req.body;
 
   // Check if the user with provided email exists

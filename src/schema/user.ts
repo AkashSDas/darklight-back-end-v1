@@ -47,10 +47,23 @@ export const confirmPasswordResetSchema = object({
   }),
 });
 
+export const loginSchema = object({
+  body: object({
+    email: string({ required_error: "Email is required" }).email(
+      "Email is invalid"
+    ),
+    password: string({ required_error: "Password is required" }),
+    confirmPassword: string({ required_error: "Confirm password is required" }),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Password and confirm password does not match",
+    path: ["confirmPassword"],
+  }),
+});
+
 export type SignupUserInput = TypeOf<typeof signupUserSchema>["body"];
 export type ConfirmEmailInput = TypeOf<typeof confirmEmailSchema>["params"];
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>["body"];
-
 export type ConfirmForgotPasswordInput = TypeOf<
   typeof confirmPasswordResetSchema
 >;
+export type LoginInput = TypeOf<typeof loginSchema>["body"];
