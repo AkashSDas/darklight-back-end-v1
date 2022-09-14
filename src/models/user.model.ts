@@ -91,7 +91,7 @@ export class UserClass {
     type: SchemaTypes.String,
     required: [true, "User ID is required"],
     unique: true,
-    maxlength: [24, "User ID must be less than 12 characters"],
+    maxlength: [24, "User ID must be less than 24 characters"],
     immutable: true,
     default: () => nanoid(24),
   })

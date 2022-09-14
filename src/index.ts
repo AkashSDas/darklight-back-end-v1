@@ -1,4 +1,3 @@
-// First loading env variables and then importing from other modules
 import { config } from "dotenv";
 
 import { app } from "./api";
